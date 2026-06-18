@@ -37,6 +37,11 @@ jobs:
       - name: BOB seals the night's work
         run: node runtime/bob-bridge/index.mjs
 
+      - name: Benevolent worm audits both chains
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node runtime/benevolent-worm/index.mjs
+
       - name: Commit WORM results back to repo
         run: |
           git config user.name  "BOB-ORACLE"

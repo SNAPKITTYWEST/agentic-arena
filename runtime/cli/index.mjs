@@ -33,6 +33,7 @@ ${YELLOW}COMMANDS:${RESET}
   crawl          run both daemons in split-terminal mode (red + blue)
   crawl --red    run AHMAD-BOT only
   crawl --blue   run EDUALC only
+  worm           release the benevolent worm — audits, maps, verifies, repairs both chains
   report         show latest WORM-sealed crawl results
   status         show scoreboard from worm/scoreboard.json
   seal           trigger BOB to seal latest crawl to WORM chain
@@ -49,6 +50,9 @@ switch (cmd) {
     if (flag === '--red')  runDaemon('red');
     else if (flag === '--blue') runDaemon('blue');
     else runBoth();
+    break;
+  case 'worm':
+    runWorm();
     break;
   case 'report':
     showReport();
@@ -132,6 +136,13 @@ function showStatus() {
   const board = JSON.parse(readFileSync(p, 'utf8'));
   console.log(`${PURPLE}${BOLD}── SCOREBOARD ──${RESET}`);
   console.log(JSON.stringify(board, null, 2));
+}
+
+function runWorm() {
+  console.log(`${PURPLE}${BOLD}releasing the benevolent worm...${RESET}\n`);
+  const worm = join(__dir, '../benevolent-worm/index.mjs');
+  const p = spawn(process.execPath, [worm], { stdio: 'inherit', env: { ...process.env } });
+  p.on('exit', code => process.exit(code ?? 0));
 }
 
 function runSeal() {
