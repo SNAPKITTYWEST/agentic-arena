@@ -1,6 +1,6 @@
 {
   "agent": "BENEVOLENT-WORM",
-  "ts": 1781791134006,
+  "ts": 1781791958737,
   "topology": {
     "repos": {
       "grisp-shadow-fleet": {
@@ -16,8 +16,8 @@
       },
       "agentic-arena": {
         "role": "live crawl layer",
-        "chain": "ARENA_GENESIS",
-        "entries": 0,
+        "chain": "d07edb9de8770e124c38d861d610f6221cced69c4eba10885f406397a8606536",
+        "entries": 3,
         "valid": true,
         "authority": [
           "crawls",
@@ -49,14 +49,14 @@
       }
     },
     "chains_agree": true,
-    "joint_seal": "2155eea89fd2ccf46f1400bce984030a335db8ddf30abe3ce593c1d698d0005d"
+    "joint_seal": "994afb3b8a036d6fbb2675b4a5ca31771d14bdaf4488b2ba29b67ea92a892f89"
   },
   "verification": {
     "checks": [
       {
         "check": "arena-chain-integrity",
         "pass": true,
-        "detail": "0 entries valid"
+        "detail": "3 entries valid"
       },
       {
         "check": "grisp-chain-integrity",
@@ -75,15 +75,23 @@
       }
     ],
     "all_pass": true,
-    "joint_seal": "2155eea89fd2ccf46f1400bce984030a335db8ddf30abe3ce593c1d698d0005d"
+    "joint_seal": "994afb3b8a036d6fbb2675b4a5ca31771d14bdaf4488b2ba29b67ea92a892f89"
   },
   "repairs": [
     {
-      "type": "no-crawl-yet",
-      "target": "agentic-arena",
-      "action": "night crawl has not fired — GitHub Actions cron needs workflow scope or manual trigger",
+      "type": "empty-repos",
+      "target": [
+        "agentic-arena",
+        "apple-ii-universal-machine",
+        "grisp-shadow-fleet",
+        "holy-agents",
+        "llm-twin-arena",
+        "myapplication",
+        "temple-os-oracle"
+      ],
+      "action": "EDUALC will populate on next crawl",
       "severity": "low"
     }
   ],
-  "summary": "4/4 checks passed | 1 repairs needed | joint seal: 2155eea89fd2ccf4..."
+  "summary": "4/4 checks passed | 1 repairs needed | joint seal: 994afb3b8a036d6f..."
 }
