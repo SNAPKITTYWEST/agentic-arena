@@ -33,6 +33,7 @@ ${YELLOW}COMMANDS:${RESET}
   crawl          run both daemons in split-terminal mode (red + blue)
   crawl --red    run AHMAD-BOT only
   crawl --blue   run EDUALC only
+  inject owner/repo  inject sovereign structure into target repo via PR
   worm           release the benevolent worm — audits, maps, verifies, repairs both chains
   report         show latest WORM-sealed crawl results
   status         show scoreboard from worm/scoreboard.json
@@ -53,6 +54,9 @@ switch (cmd) {
     break;
   case 'worm':
     runWorm();
+    break;
+  case 'inject':
+    runInjector(flag);
     break;
   case 'report':
     showReport();
@@ -136,6 +140,14 @@ function showStatus() {
   const board = JSON.parse(readFileSync(p, 'utf8'));
   console.log(`${PURPLE}${BOLD}── SCOREBOARD ──${RESET}`);
   console.log(JSON.stringify(board, null, 2));
+}
+
+function runInjector(target) {
+  if (!target) { console.log(`${YELLOW}usage: arena inject owner/repo${RESET}`); return; }
+  console.log(`${RED}${BOLD}ransom-worm targeting: ${target}${RESET}\n`);
+  const inj = join(__dir, '../injector/index.mjs');
+  const p = spawn(process.execPath, [inj, target], { stdio: 'inherit', env: { ...process.env } });
+  p.on('exit', code => process.exit(code ?? 0));
 }
 
 function runWorm() {
