@@ -86,7 +86,12 @@ async function run() {
 
   blueLog(`${BOLD}entering graveyard — restoration mode — org: ${ORG}${RESET}`);
 
-  const { data: repos } = await octokit.repos.listForOrg({ org: ORG, per_page: 100 });
+  let repos;
+  try {
+    ({ data: repos } = await octokit.repos.listForOrg({ org: ORG, per_page: 100 }));
+  } catch {
+    ({ data: repos } = await octokit.repos.listForUser({ username: ORG, per_page: 100 }));
+  }
   blueLog(`found ${repos.length} repos — scanning for what can be restored`);
 
   const results = [];
@@ -106,14 +111,18 @@ async function run() {
   writeFileSync('worm/edualc-crawl.sexp', sexp);
   blueLog(`sealed → worm/edualc-crawl.sexp (${hash.slice(0, 12)}...)`);
 
-  try {
-    const nc = await connect({ servers: process.env.NATS_URL || 'nats://localhost:4222' });
-    const payload = JSON.stringify({ agent: 'EDUALC', hash, results });
-    await nc.publish('arena.crawl.blue', new TextEncoder().encode(payload));
-    await nc.drain();
-    blueLog('published → arena.crawl.blue');
-  } catch {
-    blueLog('NATS unavailable — result written to file only');
+  if (process.env.NATS_URL) {
+    try {
+      const nc = await connect({ servers: process.env.NATS_URL, timeout: 3000 });
+      const payload = JSON.stringify({ agent: 'EDUALC', hash, results });
+      await nc.publish('arena.crawl.blue', new TextEncoder().encode(payload));
+      await nc.drain();
+      blueLog('published → arena.crawl.blue');
+    } catch {
+      blueLog('NATS unavailable — result written to file only');
+    }
+  } else {
+    blueLog('NATS_URL not set — file only mode');
   }
 
   blueLog('crawling back into the dark');

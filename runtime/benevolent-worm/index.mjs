@@ -197,9 +197,12 @@ async function repair(octokit, arenaAudit, grispAudit) {
 
   // Check for repos with no README in the org
   try {
-    const { data: repos } = await octokit.repos.listForOrg({
-      org: 'SNAPKITTYWEST', per_page: 100
-    });
+    let repos;
+    try {
+      ({ data: repos } = await octokit.repos.listForOrg({ org: 'SNAPKITTYWEST', per_page: 100 }));
+    } catch {
+      ({ data: repos } = await octokit.repos.listForUser({ username: 'SNAPKITTYWEST', per_page: 100 }));
+    }
     const noReadme = repos.filter(r => r.size === 0 || !r.description);
     if (noReadme.length > 0) {
       repairLog(`${noReadme.length} repos need description/README: ${noReadme.map(r => r.name).join(', ')}`);

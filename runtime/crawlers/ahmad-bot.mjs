@@ -79,7 +79,13 @@ async function run() {
 
   redLog(`${BOLD}entering graveyard — org: ${ORG}${RESET}`);
 
-  const { data: repos } = await octokit.repos.listForOrg({ org: ORG, per_page: 100 });
+  // Try org first, fall back to user (SNAPKITTYWEST is a user account)
+  let repos;
+  try {
+    ({ data: repos } = await octokit.repos.listForOrg({ org: ORG, per_page: 100 }));
+  } catch {
+    ({ data: repos } = await octokit.repos.listForUser({ username: ORG, per_page: 100 }));
+  }
   redLog(`found ${repos.length} repos — beginning gravity crawl`);
 
   const results = [];
@@ -99,15 +105,19 @@ async function run() {
   writeFileSync('worm/ahmad-bot-crawl.sexp', sexp);
   redLog(`sealed → worm/ahmad-bot-crawl.sexp (${hash.slice(0, 12)}...)`);
 
-  // publish to NATS if available
-  try {
-    const nc = await connect({ servers: process.env.NATS_URL || 'nats://localhost:4222' });
-    const payload = JSON.stringify({ agent: 'AHMAD-BOT', hash, results });
-    await nc.publish('arena.crawl.red', new TextEncoder().encode(payload));
-    await nc.drain();
-    redLog('published → arena.crawl.red');
-  } catch {
-    redLog('NATS unavailable — result written to file only');
+  // publish to NATS if available — skip on Windows if NATS not running
+  if (process.env.NATS_URL) {
+    try {
+      const nc = await connect({ servers: process.env.NATS_URL, timeout: 3000 });
+      const payload = JSON.stringify({ agent: 'AHMAD-BOT', hash, results });
+      await nc.publish('arena.crawl.red', new TextEncoder().encode(payload));
+      await nc.drain();
+      redLog('published → arena.crawl.red');
+    } catch {
+      redLog('NATS unavailable — result written to file only');
+    }
+  } else {
+    redLog('NATS_URL not set — file only mode');
   }
 
   redLog('crawling back into the dark');
