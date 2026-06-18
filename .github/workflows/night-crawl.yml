@@ -1,0 +1,74 @@
+name: Night Crawl — Graveyard Daemons
+
+on:
+  schedule:
+    - cron: '0 2 * * *'   # 2am UTC — no one watching
+  workflow_dispatch:        # manual trigger for testing
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      discussions: write
+
+    steps:
+      - name: Checkout arena
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Release AHMAD-BOT into graveyard
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node runtime/crawlers/ahmad-bot.mjs
+
+      - name: Release EDUALC into graveyard
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node runtime/crawlers/edualc.mjs
+
+      - name: BOB seals the night's work
+        run: node runtime/bob-bridge/index.mjs
+
+      - name: Commit WORM results back to repo
+        run: |
+          git config user.name  "BOB-ORACLE"
+          git config user.email "bob@snapkitty.ai"
+          git add worm/
+          git diff --cached --quiet || git commit -m "night crawl $(date -u '+%Y-%m-%d') — BOB sealed"
+
+      - name: Push sealed results
+        uses: ad-m/github-push-action@v0.8.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+
+      - name: Post to GitHub Discussions
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BOARD=$(cat worm/scoreboard.json | python3 -c "
+          import json,sys
+          d=json.load(sys.stdin)
+          last=d['chain'][-1] if d['chain'] else {}
+          g=last.get('data',{}).get('avg_gravity',0)
+          gaps=len(last.get('data',{}).get('top_gaps',[]))
+          print(f'**Gravity:** {g:.4f} | **Top gaps:** {gaps}')
+          ")
+          gh api graphql -f query='
+            mutation($repoId:ID!,$catId:ID!,$title:String!,$body:String!){
+              createDiscussion(input:{repositoryId:$repoId,categoryId:$catId,title:$title,body:$body}){
+                discussion{ url }
+              }
+            }' \
+            -f repoId="${{ github.repository_id }}" \
+            -f catId="DIC_kwDOA" \
+            -f title="Night Crawl $(date -u '+%Y-%m-%d') — Daemons Returned" \
+            -f body="$BOARD" || echo "Discussion post skipped — category ID needed"
