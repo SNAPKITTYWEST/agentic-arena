@@ -1,0 +1,7 @@
+node_modules/
+worm/meta-repos/
+worm/ahmad-bot-crawl.sexp
+worm/edualc-crawl.sexp
+worm/bob-handshake.sexp
+worm/worm-report.json
+*.log
