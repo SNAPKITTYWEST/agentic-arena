@@ -93,6 +93,246 @@
         ],
         "summary": "4/4 checks passed | 1 repairs needed | joint seal: 2155eea89fd2ccf4..."
       }
+    },
+    {
+      "hash": "cff481de9bdc3a1d24a7caa0fc8e23c31a09cb383b767ebfcae99d228cbdbf6a",
+      "ts": 1781791493619,
+      "data": {
+        "agent": "BOB",
+        "avg_gravity": 0.19703278688524584,
+        "top_gaps": [
+          {
+            "type": "dead_page",
+            "path": "agentic-arena",
+            "priority": 4
+          },
+          {
+            "type": "dead_page",
+            "path": "grisp-shadow-fleet",
+            "priority": 4
+          },
+          {
+            "type": "no_tests",
+            "path": "agent-farm-gauntlet",
+            "priority": 2
+          },
+          {
+            "type": "no_tests",
+            "path": "agentic-arena",
+            "priority": 2
+          },
+          {
+            "type": "no_tests",
+            "path": "agentscope-sift",
+            "priority": 2
+          }
+        ],
+        "handshake": "(bob-reasoning\n  (ts 1781791493617)\n  (avg-gravity 0.1970)\n  (red-gaps 32)\n  (blue-fixes 31)\n  (verdict critical)\n  (top-priority \"dead_page\")\n  (action alert-now))"
+      }
+    },
+    {
+      "hash": "d07edb9de8770e124c38d861d610f6221cced69c4eba10885f406397a8606536",
+      "ts": 1781791654968,
+      "agent": "BENEVOLENT-WORM",
+      "data": {
+        "agent": "BENEVOLENT-WORM",
+        "ts": 1781791654968,
+        "topology": {
+          "repos": {
+            "grisp-shadow-fleet": {
+              "role": "shadow governance layer",
+              "chain": "9c119929-worm-b4",
+              "stones": 2,
+              "valid": true,
+              "authority": [
+                "watches",
+                "predicts",
+                "evaluates"
+              ]
+            },
+            "agentic-arena": {
+              "role": "live crawl layer",
+              "chain": "cff481de9bdc3a1d24a7caa0fc8e23c31a09cb383b767ebfcae99d228cbdbf6a",
+              "entries": 2,
+              "valid": true,
+              "authority": [
+                "crawls",
+                "reports",
+                "seals"
+              ]
+            }
+          },
+          "agents": {
+            "AHMAD-BOT": {
+              "hat": "red",
+              "role": "scavenger",
+              "repo": "agentic-arena"
+            },
+            "EDUALC": {
+              "hat": "blue",
+              "role": "restorer",
+              "repo": "agentic-arena"
+            },
+            "BOB": {
+              "hat": "purple",
+              "role": "oracle",
+              "repo": "both"
+            },
+            "SHADOW": {
+              "hat": "none",
+              "role": "governance",
+              "repo": "grisp-shadow-fleet"
+            }
+          },
+          "chains_agree": true,
+          "joint_seal": "f9ef277950cc96933b4bcb8fb83e9899933491f90e087c1d58fdf4711095af91"
+        },
+        "verification": {
+          "checks": [
+            {
+              "check": "arena-chain-integrity",
+              "pass": true,
+              "detail": "2 entries valid"
+            },
+            {
+              "check": "grisp-chain-integrity",
+              "pass": true,
+              "detail": "Stone 2 — seal 9c119929-worm-b4"
+            },
+            {
+              "check": "non-recursive-law",
+              "pass": true,
+              "detail": "no Shadow->Shadow edges detected in deed declarations"
+            },
+            {
+              "check": "agent-authority-bounds",
+              "pass": true,
+              "detail": "BOB is only sealer — AHMAD-BOT and EDUALC submit only"
+            }
+          ],
+          "all_pass": true,
+          "joint_seal": "f9ef277950cc96933b4bcb8fb83e9899933491f90e087c1d58fdf4711095af91"
+        },
+        "repairs": [
+          {
+            "type": "empty-repos",
+            "target": [
+              "agentic-arena",
+              "apple-ii-universal-machine",
+              "grisp-shadow-fleet",
+              "holy-agents",
+              "llm-twin-arena",
+              "myapplication",
+              "temple-os-oracle"
+            ],
+            "action": "EDUALC will populate on next crawl",
+            "severity": "low"
+          }
+        ],
+        "summary": "4/4 checks passed | 1 repairs needed | joint seal: f9ef277950cc9693..."
+      }
+    },
+    {
+      "hash": "f139e3e8b75cc00031ac53f5165b810d5a645c7e412fbcdad5ad376306e4cb73",
+      "ts": 1781791958738,
+      "agent": "BENEVOLENT-WORM",
+      "data": {
+        "agent": "BENEVOLENT-WORM",
+        "ts": 1781791958737,
+        "topology": {
+          "repos": {
+            "grisp-shadow-fleet": {
+              "role": "shadow governance layer",
+              "chain": "9c119929-worm-b4",
+              "stones": 2,
+              "valid": true,
+              "authority": [
+                "watches",
+                "predicts",
+                "evaluates"
+              ]
+            },
+            "agentic-arena": {
+              "role": "live crawl layer",
+              "chain": "d07edb9de8770e124c38d861d610f6221cced69c4eba10885f406397a8606536",
+              "entries": 3,
+              "valid": true,
+              "authority": [
+                "crawls",
+                "reports",
+                "seals"
+              ]
+            }
+          },
+          "agents": {
+            "AHMAD-BOT": {
+              "hat": "red",
+              "role": "scavenger",
+              "repo": "agentic-arena"
+            },
+            "EDUALC": {
+              "hat": "blue",
+              "role": "restorer",
+              "repo": "agentic-arena"
+            },
+            "BOB": {
+              "hat": "purple",
+              "role": "oracle",
+              "repo": "both"
+            },
+            "SHADOW": {
+              "hat": "none",
+              "role": "governance",
+              "repo": "grisp-shadow-fleet"
+            }
+          },
+          "chains_agree": true,
+          "joint_seal": "994afb3b8a036d6fbb2675b4a5ca31771d14bdaf4488b2ba29b67ea92a892f89"
+        },
+        "verification": {
+          "checks": [
+            {
+              "check": "arena-chain-integrity",
+              "pass": true,
+              "detail": "3 entries valid"
+            },
+            {
+              "check": "grisp-chain-integrity",
+              "pass": true,
+              "detail": "Stone 2 — seal 9c119929-worm-b4"
+            },
+            {
+              "check": "non-recursive-law",
+              "pass": true,
+              "detail": "no Shadow->Shadow edges detected in deed declarations"
+            },
+            {
+              "check": "agent-authority-bounds",
+              "pass": true,
+              "detail": "BOB is only sealer — AHMAD-BOT and EDUALC submit only"
+            }
+          ],
+          "all_pass": true,
+          "joint_seal": "994afb3b8a036d6fbb2675b4a5ca31771d14bdaf4488b2ba29b67ea92a892f89"
+        },
+        "repairs": [
+          {
+            "type": "empty-repos",
+            "target": [
+              "agentic-arena",
+              "apple-ii-universal-machine",
+              "grisp-shadow-fleet",
+              "holy-agents",
+              "llm-twin-arena",
+              "myapplication",
+              "temple-os-oracle"
+            ],
+            "action": "EDUALC will populate on next crawl",
+            "severity": "low"
+          }
+        ],
+        "summary": "4/4 checks passed | 1 repairs needed | joint seal: 994afb3b8a036d6f..."
+      }
     }
   ]
 }
