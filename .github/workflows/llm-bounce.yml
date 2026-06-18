@@ -102,23 +102,71 @@ jobs:
             f.write(prompt)
           EOF
 
-      - name: Call LLM (Groq → OpenAI fallback)
+      - name: Call LLM (Nemotron → Bedrock → Groq → OpenAI)
         id: llm
         env:
-          GROQ_API_KEY:   ${{ secrets.GROQ_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          NVIDIA_API_KEY:        ${{ secrets.NVIDIA_API_KEY }}
+          AWS_ACCESS_KEY_ID:     ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          BEDROCK_MODEL_ID:      ${{ secrets.BEDROCK_MODEL_ID }}
+          GROQ_API_KEY:          ${{ secrets.GROQ_API_KEY }}
+          OPENAI_API_KEY:        ${{ secrets.OPENAI_API_KEY }}
         run: |
+          pip install boto3 -q 2>/dev/null || true
           python3 - <<'EOF'
-          import os, json, urllib.request, urllib.error
+          import os, json, urllib.request
 
           with open('/tmp/prompt.json') as f:
             data = json.load(f)
 
           response = None
 
-          # Try Groq first (free, fast)
+          # 1. Nemotron — sovereign first
+          nvidia_key = os.environ.get('NVIDIA_API_KEY','')
+          if nvidia_key and not response:
+            try:
+              payload = json.dumps({
+                "model": "nvidia/llama-3.1-nemotron-nano-8b-instruct",
+                "messages": [
+                  {"role": "system", "content": data["system"]},
+                  {"role": "user",   "content": data["user"]}
+                ],
+                "max_tokens": 300,
+                "temperature": 0.6
+              }).encode()
+              req = urllib.request.Request(
+                'https://integrate.api.nvidia.com/v1/chat/completions',
+                data=payload,
+                headers={"Authorization": f"Bearer {nvidia_key}", "Content-Type": "application/json"}
+              )
+              res = json.loads(urllib.request.urlopen(req, timeout=30).read())
+              response = res['choices'][0]['message']['content']
+              print(f"[BOB via Nemotron] {response[:80]}...")
+            except Exception as e:
+              print(f"Nemotron failed: {e}")
+
+          # 2. AWS Bedrock — Claude Haiku
+          if not response:
+            try:
+              import boto3
+              client = boto3.client('bedrock-runtime', region_name='us-east-1')
+              model_id = os.environ.get('BEDROCK_MODEL_ID','us.anthropic.claude-haiku-4-5-20251001-v1:0')
+              body = json.dumps({
+                "anthropic_version": "bedrock-2023-05-31",
+                "max_tokens": 300,
+                "system": data["system"],
+                "messages": [{"role":"user","content": data["user"]}]
+              })
+              res = client.invoke_model(modelId=model_id, body=body)
+              result = json.loads(res['body'].read())
+              response = result['content'][0]['text']
+              print(f"[BOB via Bedrock] {response[:80]}...")
+            except Exception as e:
+              print(f"Bedrock failed: {e}")
+
+          # 3. Groq — free fallback
           groq_key = os.environ.get('GROQ_API_KEY','')
-          if groq_key:
+          if not response and groq_key:
             try:
               payload = json.dumps({
                 "model": "llama-3.1-8b-instant",
@@ -135,35 +183,35 @@ jobs:
               )
               res = json.loads(urllib.request.urlopen(req, timeout=30).read())
               response = res['choices'][0]['message']['content']
-              print(f"[BOB via Groq] {response[:100]}...")
+              print(f"[BOB via Groq] {response[:80]}...")
             except Exception as e:
               print(f"Groq failed: {e}")
 
-          # Fallback: OpenAI
-          if not response:
-            openai_key = os.environ.get('OPENAI_API_KEY','')
-            if openai_key:
-              try:
-                payload = json.dumps({
-                  "model": "gpt-4o-mini",
-                  "messages": [
-                    {"role": "system", "content": data["system"]},
-                    {"role": "user",   "content": data["user"]}
-                  ],
-                  "max_tokens": 300
-                }).encode()
-                req = urllib.request.Request(
-                  'https://api.openai.com/v1/chat/completions',
-                  data=payload,
-                  headers={"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"}
-                )
-                res = json.loads(urllib.request.urlopen(req, timeout=30).read())
-                response = res['choices'][0]['message']['content']
-              except Exception as e:
-                print(f"OpenAI failed: {e}")
+          # 4. OpenAI — last resort
+          openai_key = os.environ.get('OPENAI_API_KEY','')
+          if not response and openai_key:
+            try:
+              payload = json.dumps({
+                "model": "gpt-4o-mini",
+                "messages": [
+                  {"role": "system", "content": data["system"]},
+                  {"role": "user",   "content": data["user"]}
+                ],
+                "max_tokens": 300
+              }).encode()
+              req = urllib.request.Request(
+                'https://api.openai.com/v1/chat/completions',
+                data=payload,
+                headers={"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"}
+              )
+              res = json.loads(urllib.request.urlopen(req, timeout=30).read())
+              response = res['choices'][0]['message']['content']
+              print(f"[BOB via OpenAI] {response[:80]}...")
+            except Exception as e:
+              print(f"OpenAI failed: {e}")
 
           if not response:
-            response = "The daemon stirs. No API key configured. Add GROQ_API_KEY or OPENAI_API_KEY to repository secrets."
+            response = "The daemon stirs but finds no voice. All APIs unreachable."
 
           # Write response for next step
           with open('/tmp/bob_response.txt','w') as f:
