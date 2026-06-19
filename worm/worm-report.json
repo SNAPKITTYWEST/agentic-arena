@@ -1,6 +1,6 @@
 {
   "agent": "BENEVOLENT-WORM",
-  "ts": 1781791958737,
+  "ts": 1781852268932,
   "topology": {
     "repos": {
       "grisp-shadow-fleet": {
@@ -16,8 +16,8 @@
       },
       "agentic-arena": {
         "role": "live crawl layer",
-        "chain": "d07edb9de8770e124c38d861d610f6221cced69c4eba10885f406397a8606536",
-        "entries": 3,
+        "chain": "57953a3cd7fe0c1e19d4f496a6bef32b7b25c83ace83550ad5307a299d6943af",
+        "entries": 5,
         "valid": true,
         "authority": [
           "crawls",
@@ -49,14 +49,14 @@
       }
     },
     "chains_agree": true,
-    "joint_seal": "994afb3b8a036d6fbb2675b4a5ca31771d14bdaf4488b2ba29b67ea92a892f89"
+    "joint_seal": "8f9bfee86ecd8de53bc04ed6299b86b790c8f2e7d0349bb3866b94854b3c852c"
   },
   "verification": {
     "checks": [
       {
         "check": "arena-chain-integrity",
         "pass": true,
-        "detail": "3 entries valid"
+        "detail": "5 entries valid"
       },
       {
         "check": "grisp-chain-integrity",
@@ -75,17 +75,17 @@
       }
     ],
     "all_pass": true,
-    "joint_seal": "994afb3b8a036d6fbb2675b4a5ca31771d14bdaf4488b2ba29b67ea92a892f89"
+    "joint_seal": "8f9bfee86ecd8de53bc04ed6299b86b790c8f2e7d0349bb3866b94854b3c852c"
   },
   "repairs": [
     {
       "type": "empty-repos",
       "target": [
-        "agentic-arena",
         "apple-ii-universal-machine",
         "grisp-shadow-fleet",
         "holy-agents",
         "llm-twin-arena",
+        "multiplicity",
         "myapplication",
         "temple-os-oracle"
       ],
@@ -93,5 +93,5 @@
       "severity": "low"
     }
   ],
-  "summary": "4/4 checks passed | 1 repairs needed | joint seal: 994afb3b8a036d6f..."
+  "summary": "4/4 checks passed | 1 repairs needed | joint seal: 8f9bfee86ecd8de5..."
 }
