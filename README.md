@@ -202,3 +202,5 @@ It builds the floor above them — and seals the receipt.**
 ⬡  collectivekitty.com · github.com/SNAPKITTYWEST
 ⬡  CC0 — no rights reserved — restore freely
 ```
+
+![](https://sovereign-analytics.snapkittywest.workers.dev/canary/agentic-arena)
